@@ -1,0 +1,9 @@
+# Regenerated from json/history by `python3 data.py` -- never commit
+cache/
+
+# Backtest output
+results/
+
+__pycache__/
+*.pyc
+.DS_Store
