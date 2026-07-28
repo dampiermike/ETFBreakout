@@ -8,6 +8,13 @@ tradable universe.
 Credit ETFs use adjusted_close -- HYG and JNK carry large distributions, and
 price-only series understate credit risk appetite badly. Volatility indices
 have no distributions, so adjusted_close equals close.
+
+Every adjusted series goes through `data._continuous_close`, the spliced-history
+repair (see data.py). None of these names currently carries a weld -- they are
+mature funds whose splits predate the incremental downloader -- so it is a no-op
+today. It is wired in anyway: the sleeve holds GLD and UUP with real money, and
+a weld there would be a fabricated return in the defensive leg, which is exactly
+where it would be least visible.
 """
 from __future__ import annotations
 
@@ -18,17 +25,25 @@ from typing import Dict
 import numpy as np
 import pandas as pd
 
+import data
+
 HISTORY_DIR = Path(__file__).resolve().parent / "json" / "history"
 
 
-def load_series(symbol: str, field: str = "adjusted_close") -> pd.Series:
+def _read_frame(symbol: str) -> pd.DataFrame:
     path = HISTORY_DIR / f"{symbol.replace('.', '_')}.json"
-    rows = json.load(path.open())
-    frame = pd.DataFrame(rows)
+    frame = pd.DataFrame(json.load(path.open()))
     frame["date"] = pd.to_datetime(frame["date"])
     frame = frame.set_index("date").sort_index()
     frame = frame[~frame.index.duplicated(keep="last")]
-    series = frame[field].astype(float)
+    frame = frame[(frame["close"] > 0) & frame["close"].notna()]
+    return data.drop_placeholder_rows(frame)
+
+
+def load_series(symbol: str, field: str = "adjusted_close") -> pd.Series:
+    frame = _read_frame(symbol)
+    series = (data._continuous_close(frame, symbol) if field == "adjusted_close"
+              else frame[field].astype(float))
     return series[series > 0]
 
 
@@ -156,13 +171,8 @@ def load_ohlc(symbol: str) -> pd.DataFrame:
     Needed so defensive holdings trade on the same open-to-open convention as
     the equity book rather than on closes.
     """
-    path = HISTORY_DIR / f"{symbol.replace('.', '_')}.json"
-    frame = pd.DataFrame(json.load(path.open()))
-    frame["date"] = pd.to_datetime(frame["date"])
-    frame = frame.set_index("date").sort_index()
-    frame = frame[~frame.index.duplicated(keep="last")]
-    frame = frame[(frame["close"] > 0) & frame["close"].notna()]
-    ratio = frame["adjusted_close"] / frame["close"]
+    frame = _read_frame(symbol)
+    ratio = data._continuous_close(frame, symbol) / frame["close"]
     out = pd.DataFrame(index=frame.index)
     for col in ("open", "high", "low", "close"):
         out[col] = frame[col] * ratio

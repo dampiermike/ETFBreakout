@@ -21,13 +21,19 @@ what it beat, so a future change starts from evidence rather than taste.
 Headline is quoted on the 20-PHASE LADDER, not a single rebalance offset, because
 round 13 showed phase 0 is the luckiest of 20 (it flattered Sharpe by ~0.14):
 
-    CAGR 34.8%   Sharpe 1.008   maxDD -47.1%   Calmar 0.739
-    (GLD-only sleeve:            33.3% / 0.953 / -48.4% / 0.688)
-    (previous binary-gate lock:  31.95% / 0.844 / -55.4% / 0.577)
+    CAGR 34.1%   Sharpe 0.994   maxDD -47.1%   Calmar 0.723
+    (GLD-only sleeve:            32.7% / 0.943 / -48.1% / 0.680)
+    (previous binary-gate lock:  32.6% / 0.857 / -57.3% / 0.570)
 
-Read the sleeve Sharpe as ~0.985, not 1.008: the 50-day lookback is the peak of a
+Read the sleeve Sharpe as ~0.970, not 0.994: the 50-day lookback is the peak of a
 swept 40-70 plateau, and quoting a swept peak is the same mistake as quoting
 rebalance phase 0. The plateau average is the honest expectation.
+
+Re-locked 2026-07-28 on a full, non-incremental re-download plus the spliced-
+history repair in data.py. The previous lock (34.8% / 1.008 / -47.1% / 0.739) was
+priced off fabricated corporate-action bars -- see data.py for what they were.
+Rounds 21, 25 and 26 were re-run on the corrected data and every adopted decision
+survived unchanged, rankings and plateau shape included.
 
 Why each choice, briefly:
 

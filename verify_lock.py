@@ -20,8 +20,14 @@ import strategy
 from gauntlet import N_PHASE
 
 EXPECTED = {  # from results/round26_window_sweep.csv, "GLD/UUP mom50"
-    "cagr": 0.3480, "sharpe": 1.008, "max_dd": -0.471, "calmar": 0.739,
+    "cagr": 0.3407, "sharpe": 0.994, "max_dd": -0.471, "calmar": 0.723,
 }
+# Re-locked 2026-07-28 on a full, non-incremental re-download. The previous lock
+# (0.3480 / 1.008 / -0.471 / 0.739) was priced off a spliced history: two of the
+# twenty rebalance phases held SMCL through a fabricated +2119% bar and seventeen
+# held one of the 2026-05-22 welds through fabricated -85%/-96% bars. Repairing
+# the splice in code recovered 0.3407/0.997; the refresh moved it a further
+# 0.003 Sharpe (two more trading days, plus restated distributions). See data.py.
 
 
 def ladder(cfg, ctx, gross, sleeve):
